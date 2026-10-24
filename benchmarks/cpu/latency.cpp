@@ -33,4 +33,32 @@ void chase(){
   
   sink+=p;
 }
+
+int mian(){
+  std::mt19937 rng(42);
+  const size_t target_hops = 1ull << 24;
+
+  for(size_t n = 256; n<=1ull<<22;n*=4){
+    std::vector nodes(n);
+    link(nodes,rng);
+    chase(nodes);
+
+    size_t reps = target_hops/n;
+    if(reps<1) reps=1;
+
+    auto t0 = std::chrono::steady_clock::now();
+    for(size_t r=0;r<reps;++r) chase(nodes);
+
+    auto t1 = std::chrono::steady_clock::now();
+    double ns = static_cast(
+        std::chrono::duration_cast(t1-t0).count());
+
+    double per_hop = ns/traget_hops;
+
+    std::cout<< ((n*64)>>10) << "Kib" << per_hop <<"ns/hop\n";
+
+    
+  }
+  std::cout<<"sink=" << sink << "\n";
+}
                        
