@@ -14,11 +14,12 @@ struct Node{
 };
 static_assert(sizeof(Node)== 64);
 
-void link(std::vector& nodes , std::mt19937& rng){
+
+void link(std::vector<Node>& nodes , std::mt19937& rng){
 
     const size_t n = nodes.size();
-    std::vector perm(n);
-    for(size_t i= 0 ;i<n; ++i) perm[i] = static_cast(i);
+    std::vector<std::size_t> perm(n);
+    for(size_t i= 0 ;i<n; ++i) perm[i] = static_cast<std::size_t>(i);
     std::shuffle(perm.begin(),perm.end(),rng);
     for(size_t i =0;i<n; ++i)
         nodes[perm[i]].next = perm[(i+1)%n];
@@ -26,20 +27,20 @@ void link(std::vector& nodes , std::mt19937& rng){
 
 }
 
-void chase(){
-  std::unit32_t p =0;
-  for(size_t i =0;i<nodes.size(); ++i)
-      p = nodes[p.next];
+void chase(const std::vector<Node>& nodes){
+  std::uint32_t p =0;
+  for(std::size_t i =0;i<nodes.size(); ++i)
+      p = nodes[p].next;
   
   sink+=p;
 }
 
-int mian(){
+int main(){
   std::mt19937 rng(42);
   const size_t target_hops = 1ull << 24;
 
   for(size_t n = 256; n<=1ull<<22;n*=4){
-    std::vector nodes(n);
+    std::vector<Node> nodes(n);
     link(nodes,rng);
     chase(nodes);
 
@@ -50,10 +51,13 @@ int mian(){
     for(size_t r=0;r<reps;++r) chase(nodes);
 
     auto t1 = std::chrono::steady_clock::now();
-    double ns = static_cast(
-        std::chrono::duration_cast(t1-t0).count());
+    double ns = static_cast<double>(
+      std::chrono::duration_cast<std::chrono::nanoseconds>(
+        t1 - t0
+      ).count()
+    );
 
-    double per_hop = ns/traget_hops;
+    double per_hop = ns/target_hops;
 
     std::cout<< ((n*64)>>10) << "Kib" << per_hop <<"ns/hop\n";
 
