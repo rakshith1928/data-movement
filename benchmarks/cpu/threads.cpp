@@ -17,10 +17,11 @@ int main(){
               <<std::thread::hardware_concurrency()<<"\n";
 
     const size_t bytes = 512ull << 20;
-    std::vector buf(bytes,1);
+    std::vector<std::uint8_t> buf(bytes, 1);
+    std::vector<std::uint64_t> sums(64, 0); 
+    walk_slice(buf.data(),buf.data()+bytes,&sums[0]);//warmup
 
-    std::vector sums(64,0);
-    walk_slice(buf.data(),buf.data()+bytes,&sum[0]);//warmup
+
 
     for(size_t threads:{1ull, 2ull, 4ull, 8ull}){
         const size_t slice = bytes/threads;
@@ -41,9 +42,9 @@ int main(){
 
         auto t1= std::chrono::steady_clock::now();
 
-        double ns = static_cast(
-            std::chrono::duration_cast(t1-t0).count());
-        double gbs = static_cast(bytes)/n;
+        double ns = static_cast<double>(
+            std::chrono::duration_cast<std::chrono::nanoseconds>(t1-t0).count());
+        double gbs = static_cast<double>(bytes)/ns;
 
         std::cout << threads<< "thread(s) " <<gbs<<"GB/s\n";
 

@@ -3,3 +3,5 @@ target_compile_options(walk PRIVATE -O2 -Wall)
 
 add_executable(latency cpu/latency.cpp)
 target_compile_options(latency PRIVATE -O2 -Wall)
+add_executable(threads cpu/threads.cpp)
+target_compile_options(threads PRIVATE -O2 -Wall)
